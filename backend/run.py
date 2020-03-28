@@ -1,6 +1,7 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import os
+import uuid
 
 # 通过 static_folder 指定静态资源路径，以便 index.html 能正确访问 CSS 等静态资源
 # template_folder 指定模板路径，以便 render_template 能正确渲染 index.html
@@ -16,16 +17,19 @@ CORS(APP)
 
 BOOKS = [
     {
+        'id': uuid.uuid4().hex,
         'title': 'On the Road',
         'author': 'Jack Kerouac',
         'read': True
     },
     {
+        'id': uuid.uuid4().hex,
         'title': 'Harry Potter and the Philosopher\'s Stone',
         'author': 'J. K. Rowling',
         'read': False
     },
     {
+        'id': uuid.uuid4().hex,
         'title': 'Green Eggs and Ham',
         'author': 'Dr. Seuss',
         'read': True
@@ -53,12 +57,47 @@ def ping():
     return jsonify('fromflask')
 
 
-@APP.route('/books', methods=['GET'])
+@APP.route('/books', methods=['GET', 'POST'])
 def all_books():
-    return jsonify({
-        'status': 'success',
-        'books': BOOKS
-    })
+    response_object = {'status': 'succes'}
+    if request.method == 'POST':
+        post_data = request.get_json()
+        BOOKS.append({
+            'id': uuid.uuid4().hex,
+            'title': post_data.get('title'),
+            'author': post_data.get('author'),
+            'read': post_data.get('read')
+        })
+        response_object['message'] = 'Book added!'
+    else:
+        response_object['books'] = BOOKS
+    return jsonify(response_object)
+
+@APP.route('/books/<book_id>', methods=['PUT', 'DELETE'])
+def single_book(book_id):
+    response_object = {'status': 'success'}
+    if request.method == "PUT":
+        post_data = request.get_json()
+        remove_book(book_id)
+        BOOKS.append({
+            'id': uuid.uuid4().hex,
+            'title': post_data.get('title'),
+            'author': post_data.get('author'),
+            'read': post_data.get('read')
+        })
+        response_object['message'] = 'Book updated!'
+
+    if request.method == 'DELETE':
+        remove_book(book_id):
+        response_object['message'] = 'Book removed!'
+    return jsonify(response_object)
+
+def remove_book(book_id):
+    for book in BOOKS:
+        if book['id'] == book_id:
+            BOOKS.remove(book)
+            return True
+    return False
 
 if __name__ == '__main__':
     # 开启 debug模式，这样我们就不用每更改一次文件，就重新启动一次服务
