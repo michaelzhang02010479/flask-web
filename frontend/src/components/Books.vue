@@ -14,18 +14,20 @@
               <th scope="col">Title</th>
               <th scope="col">Author</th>
               <th scope="col">Read?</th>
+              <th scope="col">Price to purchase</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(book, index) in books" :key="index">
-              <td></td>
-              <td></td>
-              <td></td>
+              <td>{{ book.id }}</td>
+              <td>{{ book.title }}</td>
+              <td>{{ book.author }}</td>
               <td>
                 <span v-if="book.read">Yes</span>
                 <span v-else>No</span>
               </td>
+              <td>{{ book.price }}</td>
               <td>
               <!--edit form to update-->
                 <button
@@ -36,7 +38,6 @@
                     Update
                 </button>
 
-                <button type="button" class="btn btn-danger btn-sm">Delete</button>
                 <button
                     type='button'
                     class='btn btn-danger btn-sm'
