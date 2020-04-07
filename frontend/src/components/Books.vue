@@ -44,6 +44,10 @@
                     @click="onDeleteBook(book)">
                     Delete
                 </button>
+                <router-link :to="`/order/${book.id}`"
+                              class="btn btn-primary btn-sm">
+                  Purchase
+                </router-link>
               </td>
             </tr>
           </tbody>
@@ -51,7 +55,7 @@
       </div>
     </div>
     
-    <!-- add book -->
+    <!-- add book modal -->
     <b-modal ref="addBookModal"
              id="book-modal"
              title="Add a new book"
@@ -66,8 +70,8 @@
                         required
                         placeholder="Enter title">
           </b-form-input>
-        </b-form-group>
-        <b-form-group id="form-author-group"
+       </b-form-group>
+       <b-form-group id="form-author-group"
                       label="Author:"
                       label-for="form-author-input">
             <b-form-input id="form-author-input"
@@ -76,7 +80,20 @@
                           required
                           placeholder="Enter author">
             </b-form-input>
-          </b-form-group>
+        </b-form-group>
+<!-- add book modal of price -->
+       <b-form-group id="form-author-group"
+                      label="Purchase price:"
+                      label-for="form-author-input">
+            <b-form-input id="form-author-input"
+                          type="number"
+                          setp="0.01"
+                          v-model="addBookForm.price"
+                          required
+                          placeholder="Enter price">
+            </b-form-input>
+        </b-form-group>
+<!-- end add book modal of price -->
         <b-form-group id="form-read-group">
           <b-form-checkbox-group v-model="addBookForm.read" id="form-checks">
             <b-form-checkbox value="true">Read?</b-form-checkbox>
@@ -128,8 +145,6 @@
   </div>
 </template>
 
->
-
 <script>
 import axios from 'axios';
 import Alert from './Alert';
@@ -143,6 +158,7 @@ export default {
         title: '',
         author: '',
         read: [],
+        price: '',
       },
       message: '',
       showMessage: false,
@@ -200,7 +216,7 @@ export default {
         const payload = {
             title: this.editForm.title,
             author: this.editForm.author,
-            read,
+            read
         };
         this.updateBook(payload, this.editForm.id);
     },
@@ -253,6 +269,7 @@ export default {
       this.addBookForm.title = '';
       this.addBookForm.author = '';
       this.addBookForm.read = [];
+      this.addBookForm.price = '';
       this.editForm.id = "";
       this.editForm.title = "";
       this.editForm.author = "";
@@ -269,6 +286,7 @@ export default {
         title: this.addBookForm.title,
         author: this.addBookForm.author,
         read, // property shorthand
+        price: this.addBookForm.price,
       };
       this.addBook(payload);
       this.initForm();
