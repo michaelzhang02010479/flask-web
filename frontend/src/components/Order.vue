@@ -35,12 +35,14 @@
                 <input type="text"
                        class="form-control"
                        placeholder="XXXXXXXXXXXXXXXX"
+                       v-model="card.number"
                        required>
               </div>
               <div class="form-group">
                 <input type="text"
                        class="form-control"
                        placeholder="CVC"
+                       v-model="card.cvc"
                        required>
               </div>
               <div class="form-group">
@@ -48,10 +50,19 @@
                 <input type="text"
                        class="form-control"
                        placeholder="MM/YY"
+                       v-model="card.exp"
                        required>
               </div>
-              <button class="btn btn-primary btn-block">Submit</button>
+              <button class="btn btn-primary btn-block" @click.prevent="validate">Submit</button>
             </form>
+            <div v-show="errors">
+                <br>
+                <ol class="text-danger">
+                    <li v-for="(error, index) in errors" :key="index">
+                        {{ error }}
+                    </li>
+                </ol>
+            </div>
           </div>
         </div>
       </div>
@@ -60,36 +71,62 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
-    data() {
-        return {
-            book: {
-                title: '',
-                author: '',
-                read: [],
-                price: '',
-            },
-        };
+  data() {
+    return {
+      book: {
+        title: '',
+        author: '',
+        read: [],
+        price: '',
+      },
+      card: {
+        number: '',
+        cvc: '',
+        exp: '',
+      },
+      errors: [],
+    };
+  },
+  methods: {
+    getBook() {
+      const path = `http://localhost:5000/books/${this.$route.params.id}`;
+      axios.get(path)
+        .then((res) => {
+          this.book = res.data.book;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
     },
-
-    methods: {
-        getBook(){
-            const path = `http://localhost:5000/books/${this.$route.params.id}`;
-            axios.get(path)
-                .then((res) =>{
-                    this.book = res.data.book;
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        },
-
-        created(){
-            this.getBook();
-        },
+    validate(){
+        this.errors = [];
+        let valid = true;
+        if (!this.card.number){
+            valid = false;
+            this.errors.push("Card Number is required");
+        }
+        if (!this.card.cvc){
+            valid = false;
+            this.errors.push("CVC is required");
+        }
+        if (!this.card.exp){
+            valid = false;
+            this.errors.push("Expiration date is required");
+        }
+        if (valid) {
+            this.creatToken();
+        }
     },
+  },
+  created() {
+    this.getBook();
+  },
+  creatToken() {
+      console.log("The form is valid!")
+  },
 };
-
-</script>>
+</script>

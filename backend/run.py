@@ -86,8 +86,7 @@ def single_book(book_id):
         for book in BOOKS:
             if book['id'] == book_id:
                 return_book = book
-            
-        response_object['book'] = book
+        response_object['book'] = return_book
 
     if request.method == "PUT":
         post_data = request.get_json()
@@ -111,6 +110,8 @@ def remove_book(book_id):
             BOOKS.remove(book)
             return True
     return False
+
+
 
 if __name__ == '__main__':
     # 开启 debug模式，这样我们就不用每更改一次文件，就重新启动一次服务
