@@ -74,6 +74,7 @@
 import axios from 'axios';
 
 export default {
+
   data() {
     return {
       book: {
@@ -88,6 +89,8 @@ export default {
         exp: '',
       },
       errors: [],
+      stripePublishableKey: 'pk_test_aIh85FLcNlk7A6B26VZiNj1h',
+      stripeCheck: false,
     };
   },
   methods: {
@@ -102,31 +105,57 @@ export default {
           console.error(error);
         });
     },
-    validate(){
-        this.errors = [];
-        let valid = true;
-        if (!this.card.number){
-            valid = false;
-            this.errors.push("Card Number is required");
+    validate() {
+      this.errors = [];
+      let valid = true;
+      if (!this.card.number) {
+        valid = false;
+        this.errors.push('Card Number is required');
+      }
+      if (!this.card.cvc) {
+        valid = false;
+        this.errors.push('CVC is required');
+      }
+      if (!this.card.exp) {
+        valid = false;
+        this.errors.push('Expiration date is required');
+      }
+      if (valid) {
+        this.createToken();
         }
-        if (!this.card.cvc){
-            valid = false;
-            this.errors.push("CVC is required");
-        }
-        if (!this.card.exp){
-            valid = false;
-            this.errors.push("Expiration date is required");
-        }
-        if (valid) {
-            this.creatToken();
-        }
-    },
-  },
+      },
   created() {
     this.getBook();
+      },
+
+      createToken() {
+    this.stripeCheck = true;
+    window.Stripe.setPublishableKey(this.stripePublishableKey);
+    window.Stripe.createToken(this.card, (status, response) => {
+    if (response.error) {
+      this.stripeCheck = false;
+      this.errors.push(response.error.message);
+      // eslint-disable-next-line
+      console.error(response);
+    } else {
+      const payload = {
+        book: this.book,
+        token: response.id,
+      };
+      const path = 'http://localhost:5000/charge';
+      axios.post(path, payload)
+        .then((res) => {
+          // updates
+          this.$router.push({ path: `/complete/${res.data.charge.id}` });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+        }
+      });
+    },
   },
-  creatToken() {
-      console.log("The form is valid!")
-  },
+
 };
 </script>

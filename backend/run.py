@@ -1,3 +1,4 @@
+import stripe
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import os
@@ -111,7 +112,32 @@ def remove_book(book_id):
             return True
     return False
 
+@app.route('/charge', methods=['POST'])
+def create_charge():
+    post_data = request.get_json()
+    amount - round(fload(post_data.get('book')['price']) * 100)
+    stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+    charge = stripe.Charge.create(
+        amount = amount,
+        currency = 'usd',
+        card = post_data.get('token')
+        description = post_data.get('book')['title']
+    )
+    response_object = {
+        'status': 'success',
+        'charge': charge
+    }
+    return jsonify(response_object), 200
 
+@app.route('/charge/<charge_id>')
+def get_charge(charge_id):
+    stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+    response_object = {
+        'status': 'success',
+        'charge': stripe.Charge.retrieve(charge_id)
+    }
+    return jsonify(respone_object), 200
+    
 
 if __name__ == '__main__':
     # 开启 debug模式，这样我们就不用每更改一次文件，就重新启动一次服务

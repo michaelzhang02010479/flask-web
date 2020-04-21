@@ -174,6 +174,7 @@ export default {
   components: {
       alert: Alert,
   },
+  
   methods: {
     // get book from flask
     getBooks() {
@@ -260,7 +261,7 @@ export default {
                 this.getBooks();
             });
     },
-    //点击delte的时候，调用removeBook，并将book的id传入removeBook方法
+    //点击delete的时候，调用removeBook，并将book的id传入removeBook方法
     onDeleteBook(book){
         this.removeBook(book.id);
     },

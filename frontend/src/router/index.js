@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Ping from '@/components/Ping'
 import Books from '@/components/Books'
 import Order from '@/components/Order'
+import OrderComplete from '@/components/OrderComplete.vue'
 
 Vue.use(Router)
 
@@ -28,6 +29,16 @@ export default new Router({
       path: '/order/:id',
       name: 'Order',
       component: Order,
+    },
+    {
+      path: '/complete',
+      name: 'OrderComplete',
+      component: OrderComplete
+    },
+    {
+      path: '/complete/:id',
+      name: 'OrderComplete',
+      component: OrderComplete
     },
   ],
   mode: 'history'
